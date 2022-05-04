@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const fs = require("fs");
-const { groth16 } = require("snarkjs");
+const { groth16, plonk } = require("snarkjs");
 
 function unstringifyBigInts(o) {
   if (typeof o == "string" && /^[0-9]+$/.test(o)) {
@@ -99,12 +99,12 @@ describe("Multiplier3 with Groth16", function () {
   it("Should return true for correct proof", async function () {
     //[assignment] insert your script here
     const { proof, publicSignals } = await groth16.fullProve(
-      { a: "1", b: "2" },
+      { a: "1", b: "2", c: "3" },
       "contracts/circuits/Multiplier3/Multiplier3_js/Multiplier3.wasm",
       "contracts/circuits/Multiplier3/circuit_final.zkey"
     );
 
-    console.log("1x2 =", publicSignals[0]);
+    // console.log("1x2 =", publicSignals[0]);
 
     const editedPublicSignals = unstringifyBigInts(publicSignals);
     const editedProof = unstringifyBigInts(proof);
@@ -151,17 +151,17 @@ describe("Multiplier3 with PLONK", function () {
 
   it("Should return true for correct proof", async function () {
     //[assignment] insert your script here
-    const { proof, publicSignals } = await groth16.fullProve(
-      { a: "1", b: "2" },
+    const { proof, publicSignals } = await plonk.fullProve(
+      { a: "1", b: "2", c: "3" },
       "contracts/circuits/_plonkMultiplier3/Multiplier3_js/Multiplier3.wasm",
       "contracts/circuits/_plonkMultiplier3/circuit_plonk.zkey"
     );
 
-    console.log("1x2 =", publicSignals[0]);
+    // console.log("1x2 =", publicSignals[0]);
 
     const editedPublicSignals = unstringifyBigInts(publicSignals);
     const editedProof = unstringifyBigInts(proof);
-    const calldata = await groth16.exportSolidityCallData(
+    const calldata = await plonk.exportSolidityCallData(
       editedProof,
       editedPublicSignals
     );
@@ -178,7 +178,6 @@ describe("Multiplier3 with PLONK", function () {
     ];
     const c = [argv[6], argv[7]];
     const Input = argv.slice(8);
-
     expect(await verifier.verifyProof(a, b, c, Input)).to.be.true;
   });
   it("Should return false for invalid proof", async function () {
