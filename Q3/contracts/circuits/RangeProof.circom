@@ -4,6 +4,9 @@ include "../../node_modules/circomlib/circuits/comparators.circom";
 
 template RangeProof(n) {
     assert(n <= 252);
+
+    // rangeの中にinが存在することを証明する
+    // range[1]=< in =< range[2]
     signal input in; // this is the number to be proved inside the range
     signal input range[2]; // the two elements should be the range, i.e. [lower bound, upper bound]
     signal output out;
@@ -12,4 +15,12 @@ template RangeProof(n) {
     component high = GreaterEqThan(n);
 
     // [assignment] insert your code here
+
+    low.in[0] <== range[0];
+    low.in[1] <== in;
+
+    high.in[0] <== in;
+    high.in[1] <== range[1];
+    
+    out <-- low.out && high.out;
 }
