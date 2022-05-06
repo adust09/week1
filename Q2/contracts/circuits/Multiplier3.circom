@@ -3,6 +3,7 @@ pragma circom 2.0.0;
 // [assignment] Modify the circuit below to perform a multiplication of three signals
 
 template Multiplier3 () {  
+   // a*b*cの解を知っていることを証明する
 
    // Declaration of signals.  
    signal input a;  

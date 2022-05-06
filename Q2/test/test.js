@@ -128,6 +128,7 @@ describe("Multiplier3 with Groth16", function () {
 
     expect(await verifier.verifyProof(a, b, c, Input)).to.be.true;
   });
+
   it("Should return false for invalid proof", async function () {
     //[assignment] insert your script here
     let a = [0, 0];
@@ -136,7 +137,7 @@ describe("Multiplier3 with Groth16", function () {
       [0, 0],
     ];
     let c = [0, 0];
-    let d = [0];
+    let d = [0, 0];
     expect(await verifier.verifyProof(a, b, c, d)).to.be.false;
   });
 });
@@ -156,11 +157,18 @@ describe("Multiplier3 with PLONK", function () {
       "contracts/circuits/_plonkMultiplier3/Multiplier3_js/Multiplier3.wasm",
       "contracts/circuits/_plonkMultiplier3/circuit_plonk.zkey"
     );
+    console.log("proof=", proof);
+    console.log("publicSignals=", publicSignals);
+    console.log("publicSignals[0]=", publicSignals[0]);
+    console.log("=================================");
 
-    // console.log("1x2 =", publicSignals[0]);
-
+    //publicSignalsとploofについて、BigIntsの文字列化を解除する
     const editedPublicSignals = unstringifyBigInts(publicSignals);
     const editedProof = unstringifyBigInts(proof);
+    console.log("editedProof=", editedProof);
+    console.log("editedPublicSignals=", editedPublicSignals);
+    // これらをgroth16検証コントラクトのコールデータとして渡す
+    //"0x.."が返ってくる
     const calldata = await plonk.exportSolidityCallData(
       editedProof,
       editedPublicSignals
@@ -171,24 +179,26 @@ describe("Multiplier3 with PLONK", function () {
       .split(",")
       .map((x) => BigInt(x).toString());
 
-    const a = [argv[0], argv[1]];
-    const b = [
-      [argv[2], argv[3]],
-      [argv[4], argv[5]],
-    ];
-    const c = [argv[6], argv[7]];
-    const Input = argv.slice(8);
-    expect(await verifier.verifyProof(a, b, c, Input)).to.be.true;
+    // console.log("1x2 =", publicSignals[0]);
+    console.log("calldata=", calldata);
+    console.log("calldata[0]=", calldata[0]);
+    console.log("calldata[1]=", calldata[1]);
+    console.log("calldata[2]=", calldata[2]);
+    console.log("=================================");
+    console.log("argv=", argv);
+    console.log("argv[0]=", argv[0]);
+    console.log("argv[1]=", argv[1]);
+    console.log("argv[2]=", argv[2]);
+    console.log("=================================");
+    console.log("JSON.parse(argv[0])=", JSON.parse(argv[0]));
+
+    expect(await verifier.verifyProof(calldata, publicSignals)).to.be.true;
   });
+
   it("Should return false for invalid proof", async function () {
     //[assignment] insert your script here
-    let a = [0, 0];
-    let b = [
-      [0, 0],
-      [0, 0],
-    ];
-    let c = [0, 0];
-    let d = [0];
-    expect(await verifier.verifyProof(a, b, c, d)).to.be.false;
+    let a = "0x00";
+    let b = ["0"];
+    expect(await verifier.verifyProof(a, b)).to.be.false;
   });
 });
