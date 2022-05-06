@@ -45,7 +45,7 @@ describe("HelloWorld", function () {
       "contracts/circuits/HelloWorld/circuit_final.zkey"
     );
 
-    console.log("1x2 =", publicSignals[0]);
+    // console.log("1x2 =", publicSignals[0]);
 
     //publicSignalsとploofについて、BigIntsの文字列化を解除する
     const editedPublicSignals = unstringifyBigInts(publicSignals);
@@ -157,42 +157,38 @@ describe("Multiplier3 with PLONK", function () {
       "contracts/circuits/_plonkMultiplier3/Multiplier3_js/Multiplier3.wasm",
       "contracts/circuits/_plonkMultiplier3/circuit_plonk.zkey"
     );
-    console.log("proof=", proof);
-    console.log("publicSignals=", publicSignals);
-    console.log("publicSignals[0]=", publicSignals[0]);
-    console.log("=================================");
 
     //publicSignalsとploofについて、BigIntsの文字列化を解除する
     const editedPublicSignals = unstringifyBigInts(publicSignals);
     const editedProof = unstringifyBigInts(proof);
-    console.log("editedProof=", editedProof);
-    console.log("editedPublicSignals=", editedPublicSignals);
     // これらをgroth16検証コントラクトのコールデータとして渡す
     //"0x.."が返ってくる
-    const calldata = await plonk.exportSolidityCallData(
+    const text = await plonk.exportSolidityCallData(
       editedProof,
       editedPublicSignals
     );
 
-    const argv = calldata
-      .replace(/["[\]\s]/g, "")
-      .split(",")
-      .map((x) => BigInt(x).toString());
+    let calldata = text.split(",");
+    let a = calldata[1] + "," + calldata[2];
 
     // console.log("1x2 =", publicSignals[0]);
-    console.log("calldata=", calldata);
-    console.log("calldata[0]=", calldata[0]);
-    console.log("calldata[1]=", calldata[1]);
-    console.log("calldata[2]=", calldata[2]);
-    console.log("=================================");
-    console.log("argv=", argv);
-    console.log("argv[0]=", argv[0]);
-    console.log("argv[1]=", argv[1]);
-    console.log("argv[2]=", argv[2]);
-    console.log("=================================");
-    console.log("JSON.parse(argv[0])=", JSON.parse(argv[0]));
+    // console.log("text=", text);
+    // console.log("=================================");
+    // console.log("calldata=", calldata);
+    // console.log("=================================");
+    // console.log("calldata[0]=", calldata[0]);
+    // console.log("=================================");
+    // console.log("calldata[1]=", calldata[1]);
+    // console.log("=================================");
+    // console.log("calldata[2]=", calldata[2]);
+    // console.log("=================================");
+    // console.log("calldata[1] + calldata[2]", calldata[1] + "," + calldata[2]);
+    // //parseがうまくいってないのが原因
+    // console.log("a=", a);
+    // console.log("=================================");
+    // console.log("JSON.parse(a))", JSON.parse(a));
 
-    expect(await verifier.verifyProof(calldata, publicSignals)).to.be.true;
+    expect(await verifier.verifyProof(calldata[0], JSON.parse(a))).to.be.true;
   });
 
   it("Should return false for invalid proof", async function () {
