@@ -7,7 +7,7 @@ include "../node_modules/circomlib-matrix/circuits/matElemSum.circom";
 include "../node_modules/circomlib-matrix/circuits/matElemPow.circom";
 include "../node_modules/circomlib/circuits/poseidon.circom";
 //[assignment] include your RangeProof template here
-include "/Users/ts21/week1/Q3/contracts/circuits/RangeProof.circom";
+include "../../../contracts/circuits/RangeProof.circom";
 
 template sudoku() {
     signal input puzzle[9][9]; // 0  where blank
